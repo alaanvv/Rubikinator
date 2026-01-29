@@ -18,6 +18,15 @@ Camera cam = {
 
 // ---
 
+
+typedef struct {
+  u8 yaw, pitch, roll;
+} Direction;
+
+Direction rcube[3][3][3] = {0};
+
+// ---
+
 int main() {
   canvas_init(&cam, config);
 
@@ -42,8 +51,19 @@ int main() {
     // 3D Drawing
     glUseProgram(shader);
 
-    model_bind(cube, shader);
-    model_draw(cube, shader);
+    for (u8 x = 0; x < 3; x++)
+      for (u8 y = 0; y < 3; y++)
+        for (u8 z = 0; z < 3; z++) {
+          model_bind(cube, shader);
+
+          glm_rotate(cube->model, PI2 * rcube[x][y][z].yaw,   VEC3(0, 1, 0));
+          glm_rotate(cube->model, PI2 * rcube[x][y][z].pitch, VEC3(0, 0, 1));
+          glm_rotate(cube->model, PI2 * rcube[x][y][z].yaw,   VEC3(1, 0, 0));
+
+          glm_translate(cube->model, VEC3(-1 + x, -1 + y, -1 + z));
+
+          model_draw(cube, shader);
+        }
 
     // Finish
     glfwSwapBuffers(cam.window);
